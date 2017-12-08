@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CarouselView.FormsPlugin.Abstractions;
@@ -38,7 +39,7 @@ namespace CarouselView.FormsPlugin.iOS
 	/// <summary>
 	/// CarouselView Renderer
 	/// </summary>
-	public class CarouselViewRenderer : ViewRenderer<CarouselViewControl, UIView>
+    public class CarouselViewRenderer : ViewRenderer<CarouselViewControl, UIView>, IUIScrollViewDelegate
 	{
         bool orientationChanged;
 
@@ -316,8 +317,17 @@ namespace CarouselView.FormsPlugin.iOS
 				{
 					scroller.ScrollEnabled = Element.IsSwipingEnabled;
 				}
+                scroller.Scrolled += (object sender, EventArgs e) => 
+                {
+                    var point = scroller.ContentOffset;
+                    double percentComplete;
+                    percentComplete = (point.X - view.Frame.Size.Width) / view.Frame.Size.Width;
+                    Debug.WriteLine("Percentage complet: "+percentComplete);
+                    Element.SendSCrollPositionChanged(percentComplete);
+                };
 			}
 		}
+
 
 		// To avoid triggering Position changed more than once
 		bool isSwiping;

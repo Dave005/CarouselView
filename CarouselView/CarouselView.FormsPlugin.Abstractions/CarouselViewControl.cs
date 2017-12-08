@@ -29,6 +29,7 @@ namespace CarouselView.FormsPlugin.Abstractions
 			set { SetValue(InterPageSpacingProperty, value); }
 		}
 
+
 		public static readonly BindableProperty IsSwipingEnabledProperty = BindableProperty.Create("IsSwipingEnabled", typeof(bool), typeof(CarouselViewControl), true);
 
 		public bool IsSwipingEnabled
@@ -135,17 +136,31 @@ namespace CarouselView.FormsPlugin.Abstractions
             set { SetValue(PositionSelectedCommandProperty, value); }
         }
 
+
 		public event EventHandler<PositionSelectedEventArgs> PositionSelected;
+
+        public event EventHandler<ScrollPositionChangedEventArgs> ScrollPositionChanged;
 
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public void SendPositionSelected()
 		{
             PositionSelected?.Invoke(this, new PositionSelectedEventArgs { NewValue = this.Position });
 		}
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void SendSCrollPositionChanged(double newValue)
+        {
+            ScrollPositionChanged?.Invoke(this, new ScrollPositionChangedEventArgs() { NewPercentage = newValue });
+        }
     }
 
 	public class PositionSelectedEventArgs : EventArgs
 	{
 		public int NewValue { get; set; }
 	}
+
+    public class ScrollPositionChangedEventArgs : EventArgs
+    {
+        public double NewPercentage { get; set; }
+    }
 }
