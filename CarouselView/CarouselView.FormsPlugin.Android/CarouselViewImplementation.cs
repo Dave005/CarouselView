@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using AGraphics = Android.Graphics;
 using Android.Content;
+using static Android.Support.V4.View.ViewPager;
 
 /*
  * Save state in Android:
@@ -35,7 +36,7 @@ namespace CarouselView.FormsPlugin.Android
     /// <summary>
     /// CarouselView Renderer
     /// </summary>
-    public class CarouselViewRenderer : ViewRenderer<CarouselViewControl, AViews.View>
+    public class CarouselViewRenderer : ViewRenderer<CarouselViewControl, AViews.View>, IOnPageChangeListener
     {
         Context _context;
 
@@ -351,7 +352,12 @@ namespace CarouselView.FormsPlugin.Android
                 else
                     nativeView = inflater.Inflate(Resource.Layout.vertical_viewpager, null);
 
+                if (viewPager != null)
+                    viewPager?.RemoveOnPageChangeListener(this);
+
                 viewPager = nativeView.FindViewById<ViewPager>(Resource.Id.pager);
+
+                viewPager?.AddOnPageChangeListener(this);
 
                 orientationChanged = false;
             }
@@ -691,6 +697,7 @@ namespace CarouselView.FormsPlugin.Android
 					if (viewPager.Adapter != null)
 						viewPager.Adapter.Dispose();
 
+                    //viewPager.RemoveOnPageChangeListener(this);
 					viewPager.Dispose();
 					viewPager = null;
 				}
@@ -722,6 +729,21 @@ namespace CarouselView.FormsPlugin.Android
         public static void Init()
         {
             var temp = DateTime.Now;
+        }
+
+        public void OnPageScrollStateChanged(int state)
+        {
+           
+        }
+
+        public void OnPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+        {
+            Element?.SendScrollPositionChanged(positionOffset);
+        }
+
+        public void OnPageSelected(int position)
+        {
+            
         }
     }
 }

@@ -147,11 +147,14 @@ namespace CarouselView.FormsPlugin.Abstractions
             PositionSelected?.Invoke(this, new PositionSelectedEventArgs { NewValue = this.Position });
 		}
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SendSCrollPositionChanged(double newValue)
+
+
+        public void SendScrollPositionChanged(double newValue)
         {
             ScrollPositionChanged?.Invoke(this, new ScrollPositionChangedEventArgs() { NewPercentage = newValue });
         }
+
+
     }
 
 	public class PositionSelectedEventArgs : EventArgs

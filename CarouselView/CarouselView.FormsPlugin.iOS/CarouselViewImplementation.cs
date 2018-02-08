@@ -100,6 +100,7 @@ namespace CarouselView.FormsPlugin.iOS
 			if (e.NewElement != null)
 			{
 				Element.SizeChanged += Element_SizeChanged;
+                //SetupScrollFeedback();
 
 				// Configure the control and subscribe to event handlers
 				if (Element.ItemsSource != null && Element.ItemsSource is INotifyCollectionChanged)
@@ -317,16 +318,29 @@ namespace CarouselView.FormsPlugin.iOS
 				{
 					scroller.ScrollEnabled = Element.IsSwipingEnabled;
 				}
-                scroller.Scrolled += (object sender, EventArgs e) => 
-                {
-                    var point = scroller.ContentOffset;
-                    double percentComplete;
-                    percentComplete = (point.X - view.Frame.Size.Width) / view.Frame.Size.Width;
-                    Debug.WriteLine("Percentage complet: "+percentComplete);
-                    Element.SendSCrollPositionChanged(percentComplete);
-                };
+
 			}
 		}
+
+        void SetupScrollFeedback()
+        {
+            foreach (var view in pageController?.View.Subviews)
+            {
+                var scroller = view as UIScrollView;
+                if (scroller != null)
+                {
+                    scroller.Scrolled += (object sender, EventArgs e) =>
+                    {
+                        var point = scroller.ContentOffset;
+                        double percentComplete;
+                        percentComplete = (point.X - view.Frame.Size.Width) / view.Frame.Size.Width;
+                        Element.SendScrollPositionChanged(percentComplete);
+                    };
+                }
+
+            }
+
+        }
 
 
 		// To avoid triggering Position changed more than once
@@ -451,6 +465,7 @@ namespace CarouselView.FormsPlugin.iOS
 
 			// IsSwipingEnabled BP
 			SetIsSwipingEnabled();
+            SetupScrollFeedback();
 
 			if (Source != null && Source?.Count > 0)
 			{
