@@ -128,7 +128,8 @@ namespace CarouselView.FormsPlugin.Android
                     Source.Insert(e.NewStartingIndex, e.OldItems[e.OldStartingIndex]);
                     viewPager.Adapter?.NotifyDataSetChanged();
 
-                    Element.SendPositionSelected();
+                    //Element.SendPositionSelected();
+                    
                     Element.PositionSelectedCommand?.Execute(null);
                 }
             }
@@ -157,7 +158,8 @@ namespace CarouselView.FormsPlugin.Android
                     viewPager.Adapter = new PageAdapter(Element);
                     viewPager.SetCurrentItem(Element.Position, false);
                     indicators?.SetViewPager(viewPager);
-                    Element.SendPositionSelected();
+                    //Element.SendPositionSelected();
+                    
                     Element.PositionSelectedCommand?.Execute(null);
                 }
             }
@@ -175,7 +177,8 @@ namespace CarouselView.FormsPlugin.Android
 					//ElementWidth = rect.Width;
 					//ElementHeight = rect.Height;
 					SetNativeView();
-                    Element.SendPositionSelected();
+                    //Element.SendPositionSelected();
+                    
                     Element.PositionSelectedCommand?.Execute(null);
                 }
             }
@@ -204,7 +207,8 @@ namespace CarouselView.FormsPlugin.Android
                     {
                         orientationChanged = true;
                         SetNativeView();
-                        Element.SendPositionSelected();
+                        //Element.SendPositionSelected();
+                        
                         Element.PositionSelectedCommand?.Execute(null);
                     }
                     break;
@@ -238,7 +242,8 @@ namespace CarouselView.FormsPlugin.Android
                         viewPager.Adapter = new PageAdapter(Element);
                         viewPager.SetCurrentItem(Element.Position, false);
                         indicators?.SetViewPager(viewPager);
-                        Element.SendPositionSelected();
+                        //Element.SendPositionSelected();
+                        
                         Element.PositionSelectedCommand?.Execute(null);
                         if (Element.ItemsSource != null && Element.ItemsSource is INotifyCollectionChanged)
                             ((INotifyCollectionChanged)Element.ItemsSource).CollectionChanged += ItemsSource_CollectionChanged;
@@ -250,7 +255,8 @@ namespace CarouselView.FormsPlugin.Android
                         viewPager.Adapter = new PageAdapter(Element);
                         viewPager.SetCurrentItem(Element.Position, false);
                         indicators?.SetViewPager(viewPager);
-                        Element.SendPositionSelected();
+                        //Element.SendPositionSelected();
+                        
                         Element.PositionSelectedCommand?.Execute(null);
                     }
                     break;
@@ -296,7 +302,8 @@ namespace CarouselView.FormsPlugin.Android
             if (e.Position == 0)
             {
                 SetArrowsVisibility();
-                Element.SendPositionSelected();
+                //Element.SendPositionSelected();
+                
                 Element.PositionSelectedCommand?.Execute(null);
             }
             isSwiping = false;
@@ -309,7 +316,8 @@ namespace CarouselView.FormsPlugin.Android
             if (e.State == 0 && !isSwiping && Element.Position > 0)
             {
                 SetArrowsVisibility();
-                Element.SendPositionSelected();
+                //Element.SendPositionSelected();
+                
                 Element.PositionSelectedCommand?.Execute(null);
             }
         }
@@ -487,7 +495,8 @@ namespace CarouselView.FormsPlugin.Android
 
                 //if (position <= prevPos)
                 //{
-                    Element.SendPositionSelected();
+                    //Element.SendPositionSelected();
+                
                     Element.PositionSelectedCommand?.Execute(null);
                 //}
             }
@@ -548,7 +557,8 @@ namespace CarouselView.FormsPlugin.Android
                 // Invoke PositionSelected when AnimateTransition is disabled
                 if (!Element.AnimateTransition)
                 {
-                    Element.SendPositionSelected();
+                    //Element.SendPositionSelected();
+                    
                     Element.PositionSelectedCommand?.Execute(null);
                 }
             }
@@ -731,19 +741,51 @@ namespace CarouselView.FormsPlugin.Android
             var temp = DateTime.Now;
         }
 
+        private int _currentScrollPosition = 0;
+
         public void OnPageScrollStateChanged(int state)
         {
-           
+            switch (state)
+            {
+                case ViewPager.ScrollStateIdle:
+                    _currentScrollPosition = Element.Position;
+                    Element.SendPositionSelected();
+                    break;
+                case ViewPager.ScrollStateDragging:
+                    break;
+                case ViewPager.ScrollStateSettling:
+                    break;
+            }
         }
 
         public void OnPageScrolled(int position, float positionOffset, int positionOffsetPixels)
         {
-            Element?.SendScrollPositionChanged(positionOffset);
+            // positionOffset of zero means end of scrolling (you would expect a value of 1) 
+            if(positionOffset == 0)
+            {
+                return;
+            }
+
+            // detect if left or right swipe
+            if(_currentScrollPosition == position)
+            {
+                // right swipe
+                Element?.SendScrollPositionChanged(positionOffset);
+            }
+            else
+            {
+                // left swipe -- invert percentage
+                Element?.SendScrollPositionChanged(-1 +positionOffset);
+            }
+
+
+
         }
 
         public void OnPageSelected(int position)
         {
-            
+            // dont use this to set the current page because it will fire before the scroll animation finishes
+            //_currentPagePosition = position;
         }
     }
 }
