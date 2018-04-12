@@ -379,7 +379,7 @@ namespace CarouselView.FormsPlugin.Android
             viewPager.PageMargin = (int)interPageSpacing;
 
             // BackgroundColor BP
-            viewPager.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
+                viewPager.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
 
             viewPager.PageSelected += ViewPager_PageSelected;
             viewPager.PageScrollStateChanged += ViewPager_PageScrollStateChanged;
